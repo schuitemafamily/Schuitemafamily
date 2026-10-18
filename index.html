@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schuitema Family Recipes | Old-Fashioned Cookbook</title>
+  <meta name="description" content="A cherished collection of Schuitema family recipes. Search, view, and share our traditional Dutch and family favorites in a vintage cookbook style.">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6b4f3a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Schuitema Recipes">
+</head>
+<body>
+  <header>
+    <h1>The Schuitema Family Cookbook</h1>
+    <p style="font-style: italic; font-size: 1.1rem;">Recipes handed down through generations • Shared with love</p>
+  </header>
+
+  <nav>
+    <button onclick="showSection('recipes')">Recipes</button>
+    <button onclick="showSection('add')">Add Recipe</button>
+    <button onclick="showSection('calculators')">Calculators</button>
+    <button onclick="showSection('notes')">Family Notes</button>
+    <button onclick="showSection('about')">About</button>
+  </nav>
+
+  <div class="container">
+    <div id="recipes-section" class="section">
+      <h2>Our Family Recipes</h2>
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search by name, ingredient, or tag (e.g. apple, dutch, pie)...">
+        <select id="category-filter">
+          <option value="All">All Categories</option>
+          <option value="Appetizers">Appetizers</option>
+          <option value="Mains">Mains</option>
+          <option value="Desserts">Desserts</option>
+          <option value="Sides">Sides</option>
+          <option value="Breakfast">Breakfast</option>
+          <option value="Holiday">Holiday</option>
+        </select>
+      </div>
+      <div id="recipe-list" class="recipe-grid"></div>
+    </div>
+
+    <div id="detail-section" class="section" style="display:none;">
+      <button class="btn secondary" onclick="showSection('recipes')">← Back to Recipes</button>
+      <h2 id="recipe-detail-title"></h2>
+      <p id="recipe-detail-meta" class="meta"></p>
+      <p id="recipe-detail-desc"></p>
+      <div class="ingredients">
+        <h3>Ingredients</h3>
+        <ul id="recipe-ingredients"></ul>
+      </div>
+      <div class="instructions">
+        <h3>Instructions</h3>
+        <ol id="recipe-instructions"></ol>
+      </div>
+      <div id="recipe-notes"></div>
+      <div style="margin-top:1.5rem;">
+        <button class="btn" onclick="generatePDF()">Download / Print PDF</button>
+        <button class="btn secondary" onclick="scaleRecipe(0.5)">½ Servings</button>
+        <button class="btn secondary" onclick="scaleRecipe(2)">Double</button>
+        <button class="btn secondary" onclick="scaleRecipe(1.5)">1.5×</button>
+      </div>
+    </div>
+
+    <div id="add-section" class="section" style="display:none;">
+      <h2>Add a New Family Recipe</h2>
+      <p>Fill in the form, review the preview, generate a PDF to check, then copy the recipe data to send to your assistant for posting to the shared site.</p>
+      <form id="add-recipe-form">
+        <div class="form-group">
+          <label>Recipe Title *</label>
+          <input type="text" name="title" required placeholder="e.g. Oma's Apple Pie">
+        </div>
+        <div class="form-group">
+          <label>Category *</label>
+          <select name="category" required>
+            <option value="Mains">Mains</option>
+            <option value="Desserts">Desserts</option>
+            <option value="Appetizers">Appetizers</option>
+            <option value="Sides">Sides</option>
+            <option value="Breakfast">Breakfast</option>
+            <option value="Holiday">Holiday</option>
+          </select>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:1rem;">
+          <div class="form-group">
+            <label>Servings</label>
+            <input type="number" name="servings" value="4" min="1">
+          </div>
+          <div class="form-group">
+            <label>Prep Time</label>
+            <input type="text" name="prepTime" placeholder="e.g. 30 min">
+          </div>
+          <div class="form-group">
+            <label>Cook Time</label>
+            <input type="text" name="cookTime" placeholder="e.g. 45 min">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" placeholder="A short story or description of the recipe..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Ingredients (one per line) *</label>
+          <textarea name="ingredients" required placeholder="2 cups flour&#10;1 cup sugar&#10;3 eggs"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Instructions (one step per line) *</label>
+          <textarea name="instructions" required placeholder="Preheat oven to 350°F&#10;Mix dry ingredients&#10;Bake for 30 minutes"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Family Notes</label>
+          <textarea name="notes" placeholder="Substitutions, history, tips from Oma, etc."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Tags (comma-separated)</label>
+          <input type="text" name="tags" placeholder="dutch, pie, holiday, family favorite">
+        </div>
+        <button type="submit" class="btn">Create & Preview Recipe</button>
+      </form>
+      <div id="preview-area" style="display:none; margin-top:2rem; padding:1.5rem; background:#fff8e7; border-radius:8px;"></div>
+      <div id="post-actions" style="display:none; margin-top:1rem;">
+        <button class="btn" onclick="generatePDF()">Generate PDF for Review</button>
+        <button class="btn secondary" onclick="copyForAssistant()">Copy Recipe for Assistant</button>
+        <p style="margin-top:0.5rem; font-size:0.9rem; font-style:italic;">After reviewing the PDF, paste the copied data to your Schuitema Recipe Bot to have it added to the live site.</p>
+      </div>
+    </div>
+
+    <div id="calculators-section" class="section" style="display:none;">
+      <h2>Kitchen Calculators</h2>
+      <div class="calculator">
+        <h3>Unit Converter</h3>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; margin:1rem 0;">
+          <input type="number" id="unit-amount" value="1" step="0.25" style="width:80px; padding:0.5rem;">
+          <select id="unit-from">
+            <option value="cup">cup</option>
+            <option value="tbsp">tbsp</option>
+            <option value="tsp">tsp</option>
+            <option value="oz">fl oz</option>
+            <option value="ml">ml</option>
+            <option value="l">liter</option>
+          </select>
+          <span>to</span>
+          <select id="unit-to">
+            <option value="ml">ml</option>
+            <option value="cup">cup</option>
+            <option value="tbsp">tbsp</option>
+            <option value="tsp">tsp</option>
+            <option value="oz">fl oz</option>
+            <option value="l">liter</option>
+          </select>
+          <button class="btn" onclick="convertUnits()">Convert</button>
+        </div>
+        <p id="unit-result" style="font-weight:600; font-size:1.1rem;"></p>
+      </div>
+      <div class="calculator">
+        <h3>Recipe Scaling Tips</h3>
+        <p>Use the scaling buttons on any recipe page for quick ½, 1.5×, or double adjustments. For precise quantity scaling of complex recipes, ask your family recipe assistant.</p>
+        <p style="margin-top:1rem;"><strong>Common conversions:</strong><br>
+        1 cup = 16 tbsp = 48 tsp ≈ 237 ml<br>
+        1 tbsp = 3 tsp ≈ 15 ml<br>
+        1 stick butter = ½ cup = 8 tbsp</p>
+      </div>
+    </div>
+
+    <div id="notes-section" class="section" style="display:none;">
+      <h2>Family Notes & Traditions</h2>
+      <div class="notes-box">
+        <p><strong>About Our Cookbook:</strong> This digital cookbook preserves the recipes that have brought the Schuitema family together for generations. Many originated in the Netherlands and were adapted over the years.</p>
+        <p style="margin-top:1rem;"><strong>How to Contribute:</strong> Use the "Add Recipe" section to create a new recipe, review the PDF, then share it with the family recipe assistant to have it permanently added.</p>
+        <p style="margin-top:1rem;"><strong>General Tips:</strong> Always measure flour by spooning into the cup and leveling. For Dutch recipes, "boerenkool" is curly kale. Many desserts taste even better the next day.</p>
+        <p style="margin-top:1rem;"><em>Add more family stories, substitutions, or seasonal notes here over time by asking your assistant to update this section.</em></p>
+      </div>
+    </div>
+
+    <div id="about-section" class="section" style="display:none;">
+      <h2>About This Cookbook</h2>
+      <p>Welcome to the Schuitema Family Recipes website — a modern way to keep our old-fashioned recipes alive and easily accessible.</p>
+      <p style="margin:1rem 0;">This site is designed to feel like an old cookbook you might find on Oma's shelf: warm parchment tones, elegant typography, and space for the notes and stories that make each recipe special.</p>
+      <ul style="margin-left:1.5rem; margin:1rem 0;">
+        <li>Easy search by name, ingredient, or tag</li>
+        <li>Family notes on every recipe</li>
+        <li>PDF generation for printing or saving</li>
+        <li>Kitchen calculators for scaling and converting</li>
+        <li>Add to your phone's home screen for quick access (PWA)</li>
+        <li>Share the link freely with family</li>
+      </ul>
+      <p><strong>To add or edit recipes:</strong> Talk to your Schuitema Recipe Assistant. It can help create, review, update, or remove recipes and keep this site current.</p>
+      <p style="margin-top:1.5rem; font-style:italic;">Built with love for the Schuitema family. May these recipes continue to gather us around the table for generations to come.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>Schuitema Family Recipes • A living cookbook • Share freely with family</p>
+    <p style="margin-top:0.5rem; font-size:0.8rem;">Add this page to your home screen for easy access. Works best in modern browsers.</p>
+  </footer>
+
+  <script src="js/recipes.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
